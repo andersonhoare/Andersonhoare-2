@@ -1,0 +1,30 @@
+[build]
+  command = "yarn run build:netlify"
+  publish = "public"
+  functions = "lambda"
+
+[[redirects]]
+  from = "/"
+  query = {wpbb = ":wpbb"}
+  to = "/.netlify/functions/postJob"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "https://andersonhoare.co.uk/office/recruitment-agency-guide/"
+  to = "https://andersonhoare.co.uk/blog/2018-12-19-how-towork-with-a-recruitment-agency-"
+  status = 301
+  force = true
+  
+[[redirects]]
+  from = "/*"
+  query = {redirect = ":true"}
+  to = "/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/*"
+  to = "index.html"
+  status = 200
+  force = false

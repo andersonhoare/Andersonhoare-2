@@ -1,0 +1,61 @@
+{
+  "name": "anderson_hoare",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "parcel index.html --out-dir public",
+    "start:dev": "dotenv -e .env -- parcel index.html --out-dir public",
+    "start:lambda": "netlify-lambda serve -t --config=./lambda.config.js src/lambda",
+    "build": "scripts/clean.sh && npm run build:bundle",
+    "build:bundle": "NODE_ENV=production parcel build index.html --out-dir public --no-source-maps",
+    "build:lambda": "netlify-lambda build src/lambda",
+    "build:netlify": "npm run build && npm run build:lambda && scripts/netlify.sh",
+    "postbuild": "react-snap"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.1.5",
+    "axios": "^0.18.0",
+    "contentful": "^6.1.0",
+    "contentful-management": "^5.3.5",
+    "dotenv": "^6.2.0",
+    "formik": "^1.3.1",
+    "netlify-lambda": "^1.6.2",
+    "nodemailer": "^5.0.0",
+    "numeral": "^2.0.6",
+    "polished": "^1.9.3",
+    "promise-polyfill": "^8.1.0",
+    "ramda": "^0.25.0",
+    "react": "16.7.0-alpha.0",
+    "react-dom": "16.7.0-alpha.0",
+    "react-helmet": "^5.2.0",
+    "react-markdown": "^3.4.1",
+    "react-media-player": "^0.7.5",
+    "react-pose": "^3.3.6",
+    "react-router-dom": "^4.2.2",
+    "react-select": "^2.1.0",
+    "react-snap": "boyswan/react-snap",
+    "styled-components": "^4.0.0",
+    "url-search-params-polyfill": "^5.1.0",
+    "xml2js": "^0.4.19",
+    "yup": "^0.26.6"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.1.2",
+    "@babel/plugin-transform-runtime": "^7.1.0",
+    "babel-eslint": "^10.0.1",
+    "babel-plugin-styled-components": "^1.5.1",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "dotenv-cli": "^8.0.0",
+    "eslint": "^3.17.1",
+    "eslint-plugin-prettier": "^2.3.1",
+    "eslint-plugin-react": "^7.8.2",
+    "parcel-bundler": "^1.11.0"
+  },
+  "homepage": "https://andersonhoare.co.uk",
+  "reactSnap": {
+    "source": "public",
+    "sourceMaps": false,
+    "sitemap": true
+  }
+}
