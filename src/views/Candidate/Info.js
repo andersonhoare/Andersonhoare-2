@@ -62,16 +62,6 @@ export default ({
           <Typography.Body light as={Body}>
             {temporaryHowWeWork}
           </Typography.Body>
-          <LinkWrap>
-            <Download
-              href={`https:${tempGuidelines.file.url}`}
-              light
-              download
-              target="_blank"
-            >
-              Download guidelines
-            </Download>
-          </LinkWrap>
         </React.Fragment>
       ),
     },

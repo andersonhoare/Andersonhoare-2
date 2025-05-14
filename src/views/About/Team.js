@@ -7,16 +7,18 @@ import Markdown from "../../components/Markdown";
 
 const ImageProfile = styled.img`
   width: 100%;
-  object-fit: cover;
+  object-fit: contain;
   height: 34.5rem;
 `;
 
 const Team = styled.ul`
   display: grid;
   grid-gap: 8rem;
-  grid-template-columns: repeat(3, 1fr);
+  align-items: center;
+  justify-content: center;
+  grid-template-columns: repeat(1fr);
   ${media.mobile`
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
   `};
   ${media.mobile_small`
     grid-template-columns: 1fr;
@@ -24,13 +26,14 @@ const Team = styled.ul`
 `;
 
 const TeamProfile = styled.li`
-  /* display: grid;
-  grid-auto-flow: row;
-  grid-gap: 2rem; */
+  text-align: center;
+  max-width: 500px;
+  margin: 0 auto;
 `;
 
 const Description = styled.div`
   padding: 2rem 0;
+  text-align: center;
 `;
 
 const Info = styled.ul`
@@ -49,7 +52,7 @@ const Italic = styled.div`
 export default ({ team }) => {
   return (
     <Center>
-      <HeaderFullFlex title="Meet the leadership team">
+      <HeaderFullFlex title="Meet Our Founder" >
         <Team>
           {team && team.length
             ? team.map(({ name, jobTitle, description, image }, key) => (

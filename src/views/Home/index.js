@@ -6,7 +6,6 @@ import LatestBlogs from "./LatestBlogs";
 import ClientsCandidates from "./ClientsCandidates";
 import Services from "./Services";
 import SearchJobs from "./SearchJobs";
-import NYBanner from "./NYBanner";
 import video_local from "../../assets/vid.mp4";
 import video_cover from "../../assets/video_cover.png";
 import styled, { css } from "styled-components";
@@ -50,7 +49,6 @@ export default ({ home, services, instagrams }) => {
   return (
     <React.Fragment>
       <SlideShow items={items} heroImage={heroImage} />
-      <NYBanner />
       <Hero
         smallIntro
         video={video_local}

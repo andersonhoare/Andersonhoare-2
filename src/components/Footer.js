@@ -180,7 +180,7 @@ export default ({
           );
         })}
       </SocialLinks>
-      <MetaType light>Copyright @2019 Anderson Hoare</MetaType>
+      <MetaType light>Copyright @2024 Anderson Hoare</MetaType>
     </Social>
     <Address>
       <MetaType light as="address">

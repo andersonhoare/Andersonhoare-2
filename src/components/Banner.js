@@ -74,11 +74,11 @@ class Header extends React.Component {
         maxWidth={sizes.desktop_xl}
         tagOuter="header"
       >
-        <span>
+        {/* <span>
           Unlock your career potential with our free online course for
           jobseekers – 5 Steps To Work
-        </span>
-        <StyledLink to={"/your-potential"}>{"here."}</StyledLink>
+        </span> */}
+        {/* <StyledLink to={"/your-potential"}>{""}</StyledLink> */}
       </Center>
     );
   }

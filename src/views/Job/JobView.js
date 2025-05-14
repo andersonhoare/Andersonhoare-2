@@ -191,7 +191,7 @@ export default withRouter(
             <Entry title="Salary" value={salary} />
             <Entry
               title="Starts"
-              value={job_startdate || job_start || "ASAP"}
+              value={job_startdate || job_start || "Already Filled"}
             />
             <Entry title="Industry" value={job_industry} />
             <Entry title="Date posted" value={formatDateTime(createdAt)} />

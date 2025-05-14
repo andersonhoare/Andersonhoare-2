@@ -142,12 +142,15 @@ const HeaderFullWrapFlex = styled.div`
   border-bottom: 0.1rem solid ${({ borderColor }) => borderColor};
   display: flex;
   flex-direction: column;
+  align-items: center;
+text-align: center;
   padding-bottom: 6rem;
   padding-top: 1rem;
 
   > h2,
   > span {
     margin-bottom: 2rem;
+    
   }
 `;
 
