@@ -185,7 +185,7 @@ const Testimony = ({ body, name, description, pose, testimonials }) => {
   return (
     <TestimonyComponent pose={pose}>
       <QuoteMark>
-        <QuoteMarkIcon fill={palette.primary} />
+        {/* <QuoteMarkIcon fill={palette.primary} /> */}
       </QuoteMark>
       <Typography.Testimonial>{body}</Typography.Testimonial>
       <Typography.Meta>{info}</Typography.Meta>
