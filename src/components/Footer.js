@@ -191,9 +191,6 @@ export default ({
       <Typography.Link accent to={route.contact}>
         Get in touch
       </Typography.Link>
-      <Typography.Link accent to={route.about}>
-        Meet the team
-      </Typography.Link>
       <Typography.Link accent to={route.clients}>
         Looking to recruit?
       </Typography.Link>

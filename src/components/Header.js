@@ -150,7 +150,7 @@ text-align: center;
   > h2,
   > span {
     margin-bottom: 2rem;
-    
+    padding-left:7rem;
   }
 `;
 

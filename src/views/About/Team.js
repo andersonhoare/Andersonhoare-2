@@ -16,7 +16,10 @@ const Team = styled.ul`
   grid-gap: 8rem;
   align-items: center;
   justify-content: center;
-  grid-template-columns: repeat(1fr);
+  grid-template-columns: 1fr;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 2rem;
   ${media.mobile`
     grid-template-columns: 1fr;
   `};
@@ -34,6 +37,8 @@ const TeamProfile = styled.li`
 const Description = styled.div`
   padding: 2rem 0;
   text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
 `;
 
 const Info = styled.ul`
@@ -52,7 +57,7 @@ const Italic = styled.div`
 export default ({ team }) => {
   return (
     <Center>
-      <HeaderFullFlex title="Meet Our Founder" >
+      <HeaderFullFlex title="Meet Our Founder" style={{ textAlign: 'center' }}>
         <Team>
           {team && team.length
             ? team.map(({ name, jobTitle, description, image }, key) => (
@@ -79,3 +84,4 @@ export default ({ team }) => {
     </Center>
   );
 };
+
