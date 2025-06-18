@@ -10,10 +10,18 @@ const cssOuter = css`
   background: ${palette.grey};
 `;
 
+const AboutSliderWrap = styled.div`
+  & > .slider {
+    grid-template-columns: 0.3fr 2fr 0.5fr !important;
+  }
+`;
+
 export default ({ testimonials }) => {
   return (
     <Center cssOuter={cssOuter} tagInner="ul">
-      <Slider items={testimonials} noDots />
+      <AboutSliderWrap>
+        <Slider items={testimonials} noDots />
+      </AboutSliderWrap>
     </Center>
   );
 };

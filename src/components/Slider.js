@@ -48,7 +48,7 @@ const TestimonyComponent = styled.div`
 }
 `;
 
-const Slider = styled.div`
+const Slider = styled.div.attrs({ className: 'slider' })`
   display: grid;
   grid-template:
     'arrowLeft content arrowRight' auto
