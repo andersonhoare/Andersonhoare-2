@@ -17,8 +17,8 @@ const cssOuter = css`
 `;
 
 const cssInner = css`
-  /* display: grid; */
-  /* grid-template-columns: repeat(2, 1fr); */
+   display: grid; 
+  grid-template-columns: repeat(2, 1fr); 
   /* grid-gap: 2rem; */
   height: 100%;
   display: flex;

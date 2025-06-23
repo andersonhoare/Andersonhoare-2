@@ -52,7 +52,7 @@ const Slider = styled.div.attrs({ className: 'slider' })`
   display: grid;
   grid-template:
     'arrowLeft content arrowRight' auto
-    / 1fr 2fr 1fr;
+    / 0.5fr 2fr 1.3fr;
   align-items: center;
   padding: 4rem 0;
   animation: ${fade} 2s linear 1;
