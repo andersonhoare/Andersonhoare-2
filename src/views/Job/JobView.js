@@ -7,6 +7,7 @@ import { route } from "../../routes";
 import { HeaderFullFlex } from "../../components/Header";
 import { Center, palette, media, Typography } from "../../style";
 import { ApplyNow } from "./Links";
+import FilledJobBanner from "../../components/FilledJobBanner";
 
 const cssOuterIntro = css`
   background: ${palette.grey};
@@ -92,6 +93,10 @@ const cssOuterDesc = css`
 
 const cssInnerDesc = css``;
 
+const MainContent = styled.div`
+  position: relative;
+`;
+
 const Entry = ({ title, value }) => (
   <React.Fragment>
     <Typography.Meta>{title}</Typography.Meta>
@@ -175,35 +180,39 @@ export default withRouter(
     }, []);
 
     const salary = formatSalary(salary_from, salary_to, salary_per);
+    const isFilled = (job_startdate || job_start) === "Already Filled";
 
     return (
       <React.Fragment>
-        <Center cssOuter={cssOuterIntro} cssInner={cssInnerIntro}>
-          <Heading>
-            <Typography.Link to={route.jobs}>
-              {" "}
-              Back to all jobs{" "}
-            </Typography.Link>
-            <Typography.H1>{job_title}</Typography.H1>
-          </Heading>
-          <Panel>
-            <Entry title="Location" value={job_location} />
-            <Entry title="Salary" value={salary} />
-            <Entry
-              title="Starts"
-              value={job_startdate || job_start || "Already Filled"}
-            />
-            <Entry title="Industry" value={job_industry} />
-            <Entry title="Date posted" value={formatDateTime(createdAt)} />
-            <Entry title="Job ref" value={job_reference} />
-          </Panel>
-        </Center>
-        <Center cssOuter={cssOuterDesc} cssInner={cssInnerDesc}>
-          <Skills>{job_skills}</Skills>
-          <HeaderFullFlex type="none" title={"Job description"}>
-            <Markdown source={job_description} />
-          </HeaderFullFlex>
-        </Center>
+        <MainContent>
+          {isFilled && <FilledJobBanner />}
+          <Center cssOuter={cssOuterIntro} cssInner={cssInnerIntro}>
+            <Heading>
+              <Typography.Link to={route.jobs}>
+                {" "}
+                Back to all jobs{" "}
+              </Typography.Link>
+              <Typography.H1>{job_title}</Typography.H1>
+            </Heading>
+            <Panel>
+              <Entry title="Location" value={job_location} />
+              <Entry title="Salary" value={salary} />
+              <Entry
+                title="Starts"
+                value={job_startdate || job_start || "Already Filled"}
+              />
+              <Entry title="Industry" value={job_industry} />
+              <Entry title="Date posted" value={formatDateTime(createdAt)} />
+              <Entry title="Job ref" value={job_reference} />
+            </Panel>
+          </Center>
+          <Center cssOuter={cssOuterDesc} cssInner={cssInnerDesc}>
+            <Skills>{job_skills}</Skills>
+            <HeaderFullFlex type="none" title={"Job description"}>
+              <Markdown source={job_description} />
+            </HeaderFullFlex>
+          </Center>
+        </MainContent>
         <ApplyNow
           title={job_title}
           createdAt={createdAt}

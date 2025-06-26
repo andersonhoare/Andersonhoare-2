@@ -8,6 +8,7 @@ import { route } from '../routes';
 import ArrowLeft from './icons/ArrowLeft';
 import ArrowRight from './icons/ArrowRight';
 import QuoteMarkIcon from './icons/QuoteMark';
+import FilledJobBanner from './FilledJobBanner';
 
 const cssOuter = css`
   background: ${palette.grey};
@@ -137,6 +138,7 @@ const Dot = styled.li`
 
 const JobComponent = styled.div`
   color: ${palette.primary};
+  position: relative;
 
   display: flex;
   flex-direction: column;
@@ -212,8 +214,11 @@ const Job = ({
   job_description
 }) => {
   const salary = formatSalary(salary_from, salary_to, salary_per);
+  const isFilled = job_start === "Already Filled";
+  
   return (
     <JobComponent pose={pose}>
+      {isFilled && <FilledJobBanner />}
       <Typography.Meta>{job_location}</Typography.Meta>
       <Typography.Input>{job_title}</Typography.Input>
       <Typography.Input>{salary}</Typography.Input>

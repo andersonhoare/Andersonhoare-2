@@ -172,7 +172,7 @@ export default ({
       <SocialLinks>
         {socialMedia.map(({ url, displayName }, key) => {
           return (
-            <li>
+            <li key={key}>
               <SocialIcon href={url} alt={displayName} target="_blank">
                 {getIcon(displayName)}
               </SocialIcon>
@@ -188,13 +188,13 @@ export default ({
       </MetaType>
     </Address>
     <Links>
-      <Typography.Link accent to={route.contact}>
+      <Typography.Link accent="true" to={route.contact}>
         Get in touch
       </Typography.Link>
-      <Typography.Link accent to={route.clients}>
+      <Typography.Link accent="true" to={route.clients}>
         Looking to recruit?
       </Typography.Link>
-      <Typography.Link accent to={route.privacy}>
+      <Typography.Link accent="true" to={route.privacy}>
         Privacy
       </Typography.Link>
     </Links>

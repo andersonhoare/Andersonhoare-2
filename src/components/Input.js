@@ -265,7 +265,7 @@ export const File = ({
         value={value}
       />
       <ErrorWrapFile>
-        <UploadButton for="file-upload" className="custom-file-upload">
+        <UploadButton htmlFor="file-upload" className="custom-file-upload">
           {!fileName ? <UploadIcon fill={palette.accent} /> : null}
           {fileName || "Upload your CV"}
         </UploadButton>

@@ -9,11 +9,13 @@ import {
 } from "../../style";
 import { toPostUrl, formatSalary, truncate } from "../../utils";
 import { route } from "../../routes";
+import FilledJobBanner from "../../components/FilledJobBanner";
 
 const Job = styled.li`
   border-bottom: 1px solid ${borderColorPrimary};
   padding: 3rem 0rem;
   display: grid;
+  position: relative;
 
   grid-template:
     "start list end" auto
@@ -108,8 +110,11 @@ export default (
   key
 ) => {
   const salary = formatSalary(salary_from, salary_to, salary_per);
+  const isFilled = (job_startdate || job_start) === "Already Filled";
+  
   return (
     <Job key={key}>
+      {isFilled && <FilledJobBanner />}
       <Start>
         <Typography.H4>{job_title}</Typography.H4>
         <BodySmall>{truncate(job_description, 165)}</BodySmall>
