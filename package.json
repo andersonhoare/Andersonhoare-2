@@ -57,5 +57,8 @@
     "source": "public",
     "sourceMaps": false,
     "sitemap": true
+  },
+  "engines": {
+    "node": "12"
   }
 }
