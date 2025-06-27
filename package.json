@@ -56,7 +56,10 @@
   "reactSnap": {
     "source": "public",
     "sourceMaps": false,
-    "sitemap": true
+    "sitemap": true,
+    "puppeteerArgs": ["--no-sandbox"],
+    "timeout": 60000,
+    "skipThirdPartyRequests": true
   },
   "engines": {
     "node": "12"
