@@ -24,7 +24,7 @@ const cssInner = css`
 export default ({ blogs }) => (
   <Center cssOuter={cssOuter} cssInner={cssInner}>
     {blogs.map((props, key) => (
-      <Blog key={key} light {...props} />
+      <Blog key={props.id || key} light {...props} />
     ))}
   </Center>
 );

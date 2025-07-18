@@ -10,13 +10,16 @@ const PopupBanner = styled.div`
   transform: translateX(-50%);
   background: ${palette.accent};
   color: ${palette.primary};
-  padding: 1rem 2.5rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  padding: 1.5rem 4rem;
+  border-radius: 12px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
   font-weight: bold;
-  font-size: 1.2rem;
+  font-size: 1.6rem;
+  min-width: 420px;
+  text-align: center;
   z-index: 9999;
 `;
+
 
 const Wrap = styled.div`
   display: grid;
@@ -30,7 +33,6 @@ const Wrap = styled.div`
 
 const TickWrap = styled.div`
   border: 1px solid ${palette.accent};
-  width: min-content;
   width: 7rem;
   height: 7rem;
   border-radius: 10rem;
@@ -43,7 +45,7 @@ const TickWrap = styled.div`
   }
 `;
 
-export default ({ title, message }) => {
+export default function OnSuccess({ title = "Application Submitted", message = "Thank you for your application!" }) {
   return (
     <Wrap>
       <PopupBanner>This job is already filled</PopupBanner>
@@ -54,4 +56,4 @@ export default ({ title, message }) => {
       </TickWrap>
     </Wrap>
   );
-};
+}

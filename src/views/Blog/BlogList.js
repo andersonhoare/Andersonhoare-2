@@ -131,9 +131,13 @@ export default ({ tags, blogs, heroBlog, blackBookBlog }) => {
           )}
         </NoResults>
 
-        {top.length ? <BlogList>{top.map(Blog)}</BlogList> : null}
+        {top.length ? <BlogList>{top.map((props, idx) => (
+          <Blog key={props.id || idx} {...props} />
+        ))}</BlogList> : null}
         {blackBookBlog ? <BlackBook {...blackBookBlog} /> : null}
-        {bottom.length ? <BlogList>{bottom.map(Blog)}</BlogList> : null}
+        {bottom.length ? <BlogList>{bottom.map((props, idx) => (
+          <Blog key={props.id || idx} {...props} />
+        ))}</BlogList> : null}
       </Center>
       <Links />
     </React.Fragment>

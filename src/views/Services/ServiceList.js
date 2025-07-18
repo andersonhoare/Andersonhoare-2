@@ -150,8 +150,9 @@ const Icon = ({ url, setRef }) => {
 const SubtitleLinks = ({ offsets, services }) => {
   return (
     <ServiceLinks>
-      {services.map((service) => (
+      {services.map((service, idx) => (
         <Typography.Body
+          key={service.title || idx}
           light
           onClick={(_) =>
             window.scrollTo({
@@ -200,9 +201,9 @@ export default ({ params, intro, image, services }) => {
 
       <Center>
         <Services>
-          {services.map(({ body, title, image }) =>
+          {services.map(({ body, title, image }, idx) =>
             !image ? null : (
-              <Service>
+              <Service key={title || idx}>
                 <Icon
                   url={image.file.url}
                   setRef={(ref) => {

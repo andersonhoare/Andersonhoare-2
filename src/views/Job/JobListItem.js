@@ -10,6 +10,7 @@ import {
 import { toPostUrl, formatSalary, truncate } from "../../utils";
 import { route } from "../../routes";
 import FilledJobBanner from "../../components/FilledJobBanner";
+import SimpleFilledBanner from "../../components/SimpleFilledBanner";
 
 const Job = styled.li`
   border-bottom: 1px solid ${borderColorPrimary};
@@ -114,7 +115,7 @@ export default (
   
   return (
     <Job key={key}>
-      {isFilled && <FilledJobBanner />}
+      {isFilled && <SimpleFilledBanner />}
       <Start>
         <Typography.H4>{job_title}</Typography.H4>
         <BodySmall>{truncate(job_description, 165)}</BodySmall>

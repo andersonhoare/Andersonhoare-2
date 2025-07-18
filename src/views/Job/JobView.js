@@ -8,6 +8,7 @@ import { HeaderFullFlex } from "../../components/Header";
 import { Center, palette, media, Typography } from "../../style";
 import { ApplyNow } from "./Links";
 import FilledJobBanner from "../../components/FilledJobBanner";
+import SimpleFilledBanner from "../../components/SimpleFilledBanner";
 
 const cssOuterIntro = css`
   background: ${palette.grey};
@@ -185,7 +186,7 @@ export default withRouter(
     return (
       <React.Fragment>
         <MainContent>
-          {isFilled && <FilledJobBanner />}
+          {isFilled && <SimpleFilledBanner />}
           <Center cssOuter={cssOuterIntro} cssInner={cssInnerIntro}>
             <Heading>
               <Typography.Link to={route.jobs}>

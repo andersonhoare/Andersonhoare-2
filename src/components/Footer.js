@@ -170,9 +170,9 @@ export default ({
   <Center cssOuter={cssOuter} cssInner={cssInner} tagOuter="footer">
     <Social>
       <SocialLinks>
-        {socialMedia.map(({ url, displayName }, key) => {
+        {socialMedia.map(({ url, displayName }, idx) => {
           return (
-            <li key={key}>
+            <li key={url || displayName || idx}>
               <SocialIcon href={url} alt={displayName} target="_blank">
                 {getIcon(displayName)}
               </SocialIcon>
@@ -188,13 +188,13 @@ export default ({
       </MetaType>
     </Address>
     <Links>
-      <Typography.Link accent="true" to={route.contact}>
+      <Typography.Link accent="true" to={route.contact} key="contact">
         Get in touch
       </Typography.Link>
-      <Typography.Link accent="true" to={route.clients}>
+      <Typography.Link accent="true" to={route.clients} key="clients">
         Looking to recruit?
       </Typography.Link>
-      <Typography.Link accent="true" to={route.privacy}>
+      <Typography.Link accent="true" to={route.privacy} key="privacy">
         Privacy
       </Typography.Link>
     </Links>

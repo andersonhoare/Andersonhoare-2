@@ -1,241 +1,242 @@
-import React from "react";
-import styled from "styled-components";
-import { Formik, Form } from "formik";
-import axios from "axios";
-import Input, { TextArea, File, Checbox, Submit } from "../components/Input";
-import { LinkCss, media, palette } from "../style";
+import React, { useState } from "react";
+import { Formik, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import styled from "styled-components";
+import Input, { Submit, Checbox, TextArea } from "../components/Input";
 import OnSuccess from "./OnSuccess";
-import { isNotIe } from "../utils";
 
-const FormComponent = styled(Form)`
-  display: grid;
-  grid-gap: 4rem;
-  padding-bottom: 8rem;
-  ${media.mobile`
-    grid-gap: 1rem;
-  `};
+const Container = styled.div`
+  padding: 5rem 2rem;
 `;
 
-const FILE_SIZE = 1.6e6;
-const SUPPORTED_FORMATS = [
-  "image/png",
-  "image/jpg",
-  "image/jpeg",
-  "application/pdf",
-  "application/msword",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-];
+const UploadButton = styled.label`
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  cursor: pointer;
+  font-family: Montserrat;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+  color: rgb(29, 59, 62);
+  border-bottom: 2px solid rgb(255, 179, 102);
+  padding-bottom: 0.3rem;
+  width: fit-content;
 
-const handleSubmit = (onSubmit) => ({
-  jobReference,
-  jobTitle,
-  name,
-  email,
-  file,
-  phone,
-  message,
-  gdpr,
-}) => {
-  const data = new FormData();
-  data.append("form-name", "jobApplication");
-  data.append("jobTitle", jobTitle);
-  data.append("jobReference", jobReference);
-  data.append("name", name);
-  data.append("email", email);
-  data.append("phone", phone);
-  data.append("message", message);
-  data.append("gdpr", String(gdpr));
-  data.append("file", file, file.name);
-
-  if (isNotIe()) {
-    gtag("event", "apply_job_contentful", {
-      content_id: jobReference,
-    });
+  span:hover {
+    color: rgb(255, 179, 102);
   }
+`;
 
-  onSubmit({ submitPending: true, submitSuccess: false, submitError: false });
-  axios({
-    url: "/",
-    method: "POST",
-    data,
-    config: { headers: { "Content-Type": "multipart/form-data" } },
-  })
-    .then(() =>
-      onSubmit({
-        submitPending: false,
-        submitSuccess: true,
-        submitError: false,
-      })
-    )
-    .catch((error) =>
-      onSubmit({
-        submitPending: false,
-        submitSuccess: false,
-        submitError: true,
-      })
-    );
-};
+const UploadIcon = styled.div`
+  color: rgb(255, 179, 102);
+  font-size: 30px;
+`;
 
-const schema = Yup.object().shape({
-  name: Yup.string().min(2, "Minimum 2 characters").required("Name required"),
-  email: Yup.string().email("Invalid email").required("Email required"),
-  phone: Yup.string(),
+const HiddenFileInput = styled.input`
+  display: none;
+`;
+
+const FormRow = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+`;
+
+const CheckboxRow = styled.div`
+  display: flex;
+  gap: 10px;
+`;
+
+const Label = styled.label`
+  width: 14rem;
+  font-weight: 500;
+  font-size: 21px;
+  color: rgb(29, 59, 62);
+  padding-top: 0.5rem;
+`;
+
+const FieldWrap = styled.div`
+  flex: 1;
+`;
+
+const LargeCheckbox = styled.div`
+  input[type="checkbox"] {
+    width: 3rem;
+    height: 3rem;
+    border: 1px solid rgba(29, 59, 62, 0.2);
+    accent-color: rgba(255, 128, 0, 1);
+  }
+`;
+
+const UploadRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-top: 1rem;
+`;
+
+const FileName = styled.div`
+  font-family: Montserrat;
+  font-size: 14px;
+  color: rgb(29, 59, 62);
+`;
+
+const FileError = styled.div`
+  font-family: Montserrat;
+  font-size: 14px;
+  font-weight: 500;
+  color: red;
+  margin-top: 0.5rem;
+  margin-left: 0.5rem;
+`;
+
+const validationSchema = Yup.object({
+  name: Yup.string().required("Name Required"),
+  email: Yup.string().email("Invalid email").required("Email Required"),
   file: Yup.mixed()
-    .required("CV required")
+    .required("Required")
     .test(
-      "fileSize",
-      "Max file size 2mb",
-      (value) => value && value.size <= FILE_SIZE
-    )
-    .test(
-      "fileFormat",
+      "fileType",
       "Must be PDF, JPG, PNG or DOC",
-      (value) => value && SUPPORTED_FORMATS.includes(value.type)
+      (value) =>
+        value &&
+        ["application/pdf", "image/jpeg", "image/png", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"].includes(
+          value.type
+        )
     ),
-  message: Yup.string().max(1500, "Maximum 1500 characters"),
-  gdpr: Yup.boolean().oneOf([true], "Required"),
+  consent: Yup.bool().oneOf([true], "Consent is required"),
 });
 
-export default ({ jobReference, jobTitle }) => {
-  const [
-    { submitPending, submitError, submitSuccess },
-    onSubmit,
-  ] = React.useState({
-    submitPending: null,
-    submitSuccess: null,
-    submitError: null,
-  });
-
-  if (submitSuccess) {
-    return (
-      <OnSuccess
-        title="Your application has been submitted"
-        message="We'll be in touch shortly"
-      />
-    );
-  }
+export default function ApplyForJob() {
+  const [submitted, setSubmitted] = useState(false);
 
   return (
-    <Formik
-      validationSchema={schema}
-      initialValues={{
-        name: "",
-        email: "",
-        phone: "",
-        file: null,
-        message: "",
-        gdpr: false,
-        jobReference: jobReference,
-        jobTitle: jobTitle,
-      }}
-      onSubmit={handleSubmit(onSubmit)}
-    >
-      {({
-        values,
-        errors,
-        touched,
-        setFieldValue,
-        setFieldTouched,
-        handleChange,
-        handleBlur,
-        handleSubmit,
-        isSubmitting,
-        isValid,
-      }) => (
-        <FormComponent
-          name="jobApplication"
-          netlify="true"
-          data-netlify="true"
-          data-netlify-honeypot="bot-field"
-          onSubmit={handleSubmit}
+    <Container>
+      {submitted ? (
+        <OnSuccess />
+      ) : (
+        <Formik
+          initialValues={{
+            name: "",
+            email: "",
+            phone: "",
+            message: "",
+            file: null,
+            consent: false,
+          }}
+          validationSchema={validationSchema}
+          onSubmit={(values, { resetForm }) => {
+            console.log(values);
+            setSubmitted(true);
+            resetForm();
+          }}
         >
-          <Input
-            type="hidden"
-            name="jobReference"
-            label="Job reference"
-            errors={errors}
-            touched={touched}
-            onChange={handleChange}
-            value={values.jobReference}
-          />
-          <Input
-            type="hidden"
-            name="jobTitle"
-            label="Job title"
-            errors={errors}
-            touched={touched}
-            onChange={handleChange}
-            value={values.jobTitle}
-          />
-          <Input
-            type="text"
-            name="name"
-            label="Full name"
-            placeholder="Enter name"
-            errors={errors}
-            touched={touched}
-            value={values.name}
-            onChange={handleChange}
-          />
-          <Input
-            type="text"
-            name="email"
-            label="Email"
-            placeholder="Enter email"
-            errors={errors}
-            touched={touched}
-            onChange={handleChange}
-            value={values.email}
-          />
-          <Input
-            type="number"
-            name="phone"
-            label="Phone"
-            placeholder="Enter phone (optional)"
-            errors={errors}
-            touched={touched}
-            value={values.phone}
-            onChange={handleChange}
-          />
-          <TextArea
-            type="text"
-            name="message"
-            label="Message"
-            placeholder="Enter message (optional)"
-            errors={errors}
-            touched={touched}
-            value={values.message}
-            onChange={handleChange}
-          />
-          <File
-            name="file"
-            label="Upload CV"
-            errors={errors}
-            touched={touched}
-            onChange={(file) => {
-              setFieldTouched("file", true);
-              setFieldValue("file", file);
-            }}
-          />
-          <Checbox
-            name="gdpr"
-            label="I consent to Anderson Hoare collecting and storing my data"
-            value={values.gdpr}
-            onChange={(gdpr) => {
-              setFieldTouched("gdpr", true);
-              setFieldValue("gdpr", gdpr);
-            }}
-          />
+          {({ setFieldValue, values, isValid, dirty }) => (
+            <Form>
+              <FormRow>
+                <Label htmlFor="name">Full name</Label>
+                <FieldWrap>
+                  <Input name="name" placeholder="Enter name" />
+                </FieldWrap>
+              </FormRow>
 
-          <Submit
-            submitPending={submitPending}
-            submitSuccess={submitSuccess}
-            submitError={submitError}
-            disabled={isValid == false || submitPending == true}
-          />
-        </FormComponent>
+              <FormRow>
+                <Label htmlFor="email">Email</Label>
+                <FieldWrap>
+                  <Input name="email" type="email" placeholder="Enter Email" />
+                </FieldWrap>
+              </FormRow>
+
+              <FormRow>
+                <Label htmlFor="phone">Phone</Label>
+                <FieldWrap>
+                  <Input
+                    name="phone"
+                    type="tel"
+                    placeholder="Enter phone (optional)"
+                  />
+                </FieldWrap>
+              </FormRow>
+
+              <FormRow>
+                <Label htmlFor="message">Message</Label>
+                <FieldWrap>
+                  <TextArea
+                    name="message"
+                    placeholder="Enter message (optional)"
+                  />
+                </FieldWrap>
+              </FormRow>
+
+              <FormRow>
+                <Label htmlFor="file">Upload CV</Label>
+                <FieldWrap>
+                  <UploadRow>
+                    <UploadButton htmlFor="file">
+                      <UploadIcon>↑</UploadIcon>
+                      <span>Upload your CV</span>
+                    </UploadButton>
+                    <HiddenFileInput
+                      id="file"
+                      name="file"
+                      type="file"
+                      accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                      onChange={(e) => {
+                        const file = e.currentTarget.files[0];
+                        setFieldValue("file", file);
+                      }}
+                    />
+                    {values.file && <FileName>{values.file.name}</FileName>}
+                  </UploadRow>
+                  <ErrorMessage name="file" component={FileError} />
+                </FieldWrap>
+              </FormRow>
+
+              <FormRow>
+                <Label />
+                <CheckboxRow>
+                  <LargeCheckbox>
+                    <Checbox name="consent" />
+                  </LargeCheckbox>
+                  <span
+                    style={{
+                      fontFamily: "Montserrat",
+                      fontSize: "16px",
+                      fontWeight: 300,
+                      fontStyle: "normal",
+                      fontStretch: "normal",
+                      lineHeight: 1.6,
+                      letterSpacing: "normal",
+                      color: "rgb(29, 59, 62)",
+                      marginLeft: "10px",
+                    }}
+                  >
+                    I consent to Anderson Hoare collecting and storing my data
+                  </span>
+                </CheckboxRow>
+              </FormRow>
+
+              <FormRow>
+                <Label />
+                <FieldWrap>
+                  <Submit type="submit" disabled={!(isValid && dirty)}>
+                    Submit
+                  </Submit>
+                </FieldWrap>
+              </FormRow>
+            </Form>
+          )}
+        </Formik>
       )}
-    </Formik>
+    </Container>
   );
-};
+}

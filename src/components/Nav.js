@@ -262,7 +262,7 @@ const LinkSub = ({
           {links.map((link, key) => {
             return (
               <LinkComponent
-                key={key}
+                key={link.to || link.label || key}
                 pathname={pathname}
                 toggleMenu={() => {
                   toggleMenu();
@@ -329,7 +329,7 @@ class Header extends React.Component {
                       subMenu,
                     }));
                   }}
-                  key={key}
+                  key={link.title || key}
                   pathname={pathname}
                   toggleMenu={this.closeMenu}
                   {...link}
@@ -338,7 +338,7 @@ class Header extends React.Component {
             }
             return (
               <LinkComponent
-                key={key}
+                key={link.to || link.label || key}
                 pathname={pathname}
                 toggleMenu={this.closeMenu}
                 {...link}

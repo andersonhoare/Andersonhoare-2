@@ -44,8 +44,8 @@ const Wrap = styled.div`
 
 export default ({ children }) => (
   <Center cssOuter={cssOuter} cssInner={cssInner}>
-    {React.Children.map(children, child => (
-      <Wrap len={children.length}>{child}</Wrap>
+    {React.Children.map(children, (child, idx) => (
+      <Wrap key={idx} len={children.length}>{child}</Wrap>
     ))}
   </Center>
 );

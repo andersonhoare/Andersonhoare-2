@@ -58,6 +58,8 @@ export default ({ blogIntro, blogs }) => (
       <Typography.Body>{blogIntro}</Typography.Body>
       <Typography.Link to={route.blog}>View all latest</Typography.Link>
     </Intro>
-    {blogs.length ? blogs.map(Blog) : null}
+    {blogs.length ? blogs.map((props, idx) => (
+      <Blog key={props.id || idx} {...props} />
+    )) : null}
   </Center>
 );

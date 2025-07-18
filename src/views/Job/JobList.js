@@ -135,7 +135,7 @@ export default ({
             </Typography.Input>
           </NoResults>
         ) : (
-          <JobList>{filteredJobs.sort(sortByDate).map(JobListItem)}</JobList>
+          <JobList>{filteredJobs.sort(sortByDate).map((job, idx) => <JobListItem key={job.job_reference || idx} {...job} />)}</JobList>
         )}
       </Center>
       <Links />
