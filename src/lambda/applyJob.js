@@ -9,14 +9,13 @@ const headers = {
   'Access-Control-Allow-Headers': 'Content-Type'
 };
 
+// Use SendGrid SMTP
 let transporter = nodemailer.createTransport({
-  host: 'mx.aplitrak.com',
-  port: 25,
-  secure: false,
-  logger: true,
-  debug: false,
-  connectionTimeout: 1000 * 5,
-  tls: { rejectUnauthorized: false }
+  service: 'SendGrid',
+  auth: {
+    user: 'apikey', // this is the literal string 'apikey'
+    pass: process.env.SENDGRID_API_KEY
+  }
 });
 
 exports.handler = async (event, context, callback) => {
@@ -31,9 +30,9 @@ exports.handler = async (event, context, callback) => {
 
     let mailOptions = {
       from: form.candidate_email,
-      to: form.application_email,
+      to: 'lottie@andersonhoare.co.uk',
       subject: `New Job Application from ${form.candidate_name}`,
-      cc: 'admin@andersonhoare.co.uk', // Add your admin/HR email here
+      // cc: 'admin@andersonhoare.co.uk', // Remove or update as needed
       replyTo: `${form.candidate_name} <${form.candidate_email}>`,
       attachments: [
         {
@@ -52,8 +51,8 @@ exports.handler = async (event, context, callback) => {
       body: 'Email sent! >> ' + JSON.stringify(email)
     };
   } catch (error) {
-    let msg = 'ERROR >> ' + error.message;
-    console.log(msg)
+    let msg = 'ERROR >> ' + error.message + '\n' + error.stack + '\nPayload: ' + event.body;
+    console.log(msg);
     return {
       headers,
       statusCode: 500,
