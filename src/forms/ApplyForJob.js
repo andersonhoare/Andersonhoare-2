@@ -4,6 +4,7 @@ import * as Yup from "yup";
 import styled from "styled-components";
 import Input, { Submit, Checbox, TextArea } from "../components/Input";
 import OnSuccess from "./OnSuccess";
+import axios from "axios";
 
 const Container = styled.div`
   padding: 5rem 2rem;
@@ -118,6 +119,43 @@ const validationSchema = Yup.object({
 
 export default function ApplyForJob() {
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState(null);
+
+  async function handleSubmit(values, { resetForm }) {
+    setError(null);
+    try {
+      // Read file as base64
+      const file = values.file;
+      const getBase64 = (file) => {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = (error) => reject(error);
+        });
+      };
+      const fileBase64 = await getBase64(file);
+      // Prepare payload for lambda
+      const payload = {
+        candidate_name: values.name,
+        candidate_email: values.email,
+        phone: values.phone,
+        message: values.message,
+        file: {
+          file: fileBase64,
+          type: file.name.split('.').pop() || 'pdf',
+        },
+        application_email: process.env.REACT_APP_APPLICATION_EMAIL || "info@andersonhoare.co.uk"
+      };
+      // Call Netlify lambda function
+      await axios.post("/.netlify/functions/applyJob", payload);
+      setSubmitted(true);
+      resetForm();
+    } catch (err) {
+      setError("There was a problem submitting your application. Please try again.");
+      console.error(err);
+    }
+  }
 
   return (
     <Container>
@@ -134,11 +172,7 @@ export default function ApplyForJob() {
             consent: false,
           }}
           validationSchema={validationSchema}
-          onSubmit={(values, { resetForm }) => {
-            console.log(values);
-            setSubmitted(true);
-            resetForm();
-          }}
+          onSubmit={handleSubmit}
         >
           {({ setFieldValue, values, isValid, dirty }) => (
             <Form>
@@ -233,6 +267,9 @@ export default function ApplyForJob() {
                   </Submit>
                 </FieldWrap>
               </FormRow>
+              {error && (
+                <div style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>
+              )}
             </Form>
           )}
         </Formik>

@@ -1,3 +1,5 @@
+// To change the default recipient, set REACT_APP_APPLICATION_EMAIL in your Netlify environment variables.
+
 if (process.env.NODE_ENV == 'development') require('dotenv').config();
 
 const nodemailer = require('nodemailer');
@@ -24,14 +26,14 @@ exports.handler = async (event, context, callback) => {
     console.log("Client IP ->", event.headers["client-ip"]);
     console.log("Content length ->", event.headers["content-length"]);
 
-
     const form = JSON.parse(event.body);
-    
     console.log("FROM >> ", form.candidate_email);
-    
+
     let mailOptions = {
       from: form.candidate_email,
       to: form.application_email,
+      subject: `New Job Application from ${form.candidate_name}`,
+      cc: 'admin@andersonhoare.co.uk', // Add your admin/HR email here
       replyTo: `${form.candidate_name} <${form.candidate_email}>`,
       attachments: [
         {
@@ -39,19 +41,11 @@ exports.handler = async (event, context, callback) => {
           path: form.file.file
         }
       ],
-      text: `
-      ${form.candidate_name}
-      ${form.candidate_email}
-      ${form.phone}
-      --------------------------
-      ${form.message}
-      `
+      text: `Job Application Details\n\nName: ${form.candidate_name}\nEmail: ${form.candidate_email}\nPhone: ${form.phone}\n\nMessage:\n${form.message}\n\n---\nThis application was submitted via the Anderson Hoare job application form.`
     };
 
     const email = await transporter.sendMail(mailOptions);
-    
     console.log(email)
-    
     return {
       headers,
       statusCode: 200,
