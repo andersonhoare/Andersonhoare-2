@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Formik, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import styled from "styled-components";
@@ -121,8 +121,14 @@ export default function ApplyForJob() {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState(null);
 
+  useEffect(() => {
+    let isMounted = true;
+    return () => { isMounted = false; };
+  }, []);
+
   async function handleSubmit(values, { resetForm }) {
     setError(null);
+    let isMounted = true;
     try {
       // Read file as base64
       const file = values.file;
@@ -149,10 +155,14 @@ export default function ApplyForJob() {
       };
       // Call Netlify lambda function
       await axios.post("/.netlify/functions/applyJob", payload);
-      setSubmitted(true);
-      resetForm();
+      if (isMounted) {
+        setSubmitted(true);
+        resetForm();
+      }
     } catch (err) {
-      setError("There was a problem submitting your application. Please try again.");
+      if (isMounted) {
+        setError("There was a problem submitting your application. Please try again.");
+      }
       console.error(err);
     }
   }

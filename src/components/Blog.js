@@ -95,7 +95,7 @@ export const Tags = ({ tags, as = TagWrap }) =>
   tags && tags.length ? (
     <TagWrap as={as}>
       {tags.map(({ tagName }, key) => (
-        <Tag key={key}>{tagName}</Tag>
+        <Tag key={tagName || key}>{tagName}</Tag>
       ))}
     </TagWrap>
   ) : null;
