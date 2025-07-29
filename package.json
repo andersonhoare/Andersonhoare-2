@@ -57,11 +57,13 @@
     "source": "public",
     "sourceMaps": false,
     "sitemap": true,
-    "puppeteerArgs": ["--no-sandbox"],
+    "puppeteerArgs": [
+      "--no-sandbox"
+    ],
     "timeout": 60000,
     "skipThirdPartyRequests": true
   },
   "engines": {
-    "node": "12"
+    "node": "16"
   }
 }
