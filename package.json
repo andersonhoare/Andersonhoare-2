@@ -64,6 +64,6 @@
     "skipThirdPartyRequests": true
   },
   "engines": {
-    "node": "12"
+    "node": "20"
   }
 }
