@@ -27,7 +27,7 @@ exports.handler = async (event, context, callback) => {
 
     const form = JSON.parse(event.body);
     console.log("FROM >> ", form.candidate_email);
-
+    
     let mailOptions = {
       from: form.candidate_email,
       to: 'lottie@andersonhoare.co.uk',
