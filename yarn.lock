@@ -7847,6 +7847,7 @@ react-side-effect@^1.1.0:
 "react-snap@https://github.com/boyswan/react-snap.git":
   version "1.24.1"
   resolved "git+ssh://git@github.com/boyswan/react-snap.git#8bb8bed4cae324cf112a1abd0e5e386d1991963d"
+  integrity sha512-KblvM9CnuX+VvVpFUuzXD0rAYLCf3qarBfqAKUBkYsGTa9RPcwihBJmZ6lmJZWdY1MEi6Zb+Y+wdJGvT0OJZ1w==
   dependencies:
     clean-css "4.2.1"
     express "4.16.4"
