@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Formik, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import styled from "styled-components";
 import Input, { Submit, Checbox, TextArea } from "../components/Input";
 import OnSuccess from "./OnSuccess";
-import axios from "axios";
+import emailjs from "@emailjs/browser";
 
 const Container = styled.div`
   padding: 5rem 2rem;
@@ -16,15 +16,12 @@ const UploadButton = styled.label`
   gap: 5px;
   cursor: pointer;
   font-family: Montserrat;
-  font-style: normal;
   font-weight: 500;
   font-size: 16px;
-  letter-spacing: 0.5px;
   color: rgb(29, 59, 62);
   border-bottom: 2px solid rgb(255, 179, 102);
   padding-bottom: 0.3rem;
   width: fit-content;
-
   span:hover {
     color: rgb(255, 179, 102);
   }
@@ -45,7 +42,6 @@ const FormRow = styled.div`
   gap: 1.5rem;
   margin-bottom: 2.5rem;
   flex-wrap: wrap;
-
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: stretch;
@@ -105,67 +101,55 @@ const validationSchema = Yup.object({
   email: Yup.string().email("Invalid email").required("Email Required"),
   file: Yup.mixed()
     .required("Required")
-    .test(
-      "fileType",
-      "Must be PDF, JPG, PNG or DOC",
-      (value) =>
-        value &&
-        ["application/pdf", "image/jpeg", "image/png", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"].includes(
-          value.type
-        )
+    .test("fileType", "Must be PDF, JPG, PNG or DOC", (value) =>
+      value
+        ? [
+            "application/pdf",
+            "image/jpeg",
+            "image/png",
+            "application/msword",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          ].includes(value.type)
+        : false
     ),
   consent: Yup.bool().oneOf([true], "Consent is required"),
 });
 
 export default function ApplyForJob() {
   const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    let isMounted = true;
-    return () => { isMounted = false; };
-  }, []);
+  const uploadToCloudinary = async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET);
 
-  async function handleSubmit(values, { resetForm }) {
-    setError(null);
-    let isMounted = true;
-    try {
-      // Read file as base64
-      const file = values.file;
-      const getBase64 = (file) => {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.readAsDataURL(file);
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = (error) => reject(error);
-        });
-      };
-      const fileBase64 = await getBase64(file);
-      // Prepare payload for lambda
-      const payload = {
-        candidate_name: values.name,
-        candidate_email: values.email,
-        phone: values.phone,
-        message: values.message,
-        file: {
-          file: fileBase64,
-          type: file.name.split('.').pop() || 'pdf',
-        },
-        application_email: process.env.REACT_APP_APPLICATION_EMAIL || "info@andersonhoare.co.uk"
-      };
-      // Call Netlify lambda function
-      await axios.post("/.netlify/functions/applyJob", payload);
-      if (isMounted) {
-        setSubmitted(true);
-        resetForm();
-      }
-    } catch (err) {
-      if (isMounted) {
-        setError("There was a problem submitting your application. Please try again.");
-      }
-      console.error(err);
-    }
-  }
+    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/upload`, {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await res.json();
+    if (!data.secure_url) throw new Error("Cloudinary upload failed");
+    return data.secure_url;
+  };
+
+  const sendEmail = async (values, fileUrl) => {
+    const templateParams = {
+      name: values.name,
+      email: values.email,
+      phone: values.phone || "N/A",
+      message: values.message || "N/A",
+      file_url: fileUrl,
+    };
+
+    await emailjs.send(
+      process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID,
+      process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID,
+      templateParams,
+      process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
+    );
+  };
 
   return (
     <Container>
@@ -182,7 +166,17 @@ export default function ApplyForJob() {
             consent: false,
           }}
           validationSchema={validationSchema}
-          onSubmit={handleSubmit}
+          onSubmit={async (values, { resetForm }) => {
+            try {
+              const fileUrl = await uploadToCloudinary(values.file);
+              await sendEmail(values, fileUrl);
+              setSubmitted(true);
+              resetForm();
+            } catch (error) {
+              alert("Submission failed. Please try again.");
+              console.error("Error:", error);
+            }
+          }}
         >
           {({ setFieldValue, values, isValid, dirty }) => (
             <Form>
@@ -256,10 +250,7 @@ export default function ApplyForJob() {
                       fontFamily: "Montserrat",
                       fontSize: "16px",
                       fontWeight: 300,
-                      fontStyle: "normal",
-                      fontStretch: "normal",
                       lineHeight: 1.6,
-                      letterSpacing: "normal",
                       color: "rgb(29, 59, 62)",
                       marginLeft: "10px",
                     }}
@@ -277,9 +268,6 @@ export default function ApplyForJob() {
                   </Submit>
                 </FieldWrap>
               </FormRow>
-              {error && (
-                <div style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>
-              )}
             </Form>
           )}
         </Formik>

@@ -1,6 +1,8 @@
 node_modules
 .cache
+.DS_Store
 
-env
+public
+lambda/*
 yarn-error.log
 .netlify
