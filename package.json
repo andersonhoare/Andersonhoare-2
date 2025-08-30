@@ -36,7 +36,7 @@
     "react-pose": "^3.3.6",
     "react-router-dom": "^4.2.2",
     "react-select": "^2.1.0",
-    "react-snap": "boyswan/react-snap",
+    "react-snap": "https://github.com/boyswan/react-snap.git",
     "styled-components": "^4.0.0",
     "url-search-params-polyfill": "^5.1.0",
     "xml2js": "^0.4.19",
