@@ -1,6 +1,6 @@
 [build]
-  node_version = "16"
-  command = "yarn run build:netlify"
+  node_version = "12"
+  command = "npm run build:netlify"
   publish = "public"
   functions = "lambda"
 
