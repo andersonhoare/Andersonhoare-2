@@ -48,7 +48,7 @@ const TickWrap = styled.div`
 export default function OnSuccess({ title = "Application Submitted", message = "Thank you for your application!" }) {
   return (
     <Wrap>
-      <PopupBanner>This job is already filled</PopupBanner>
+      <PopupBanner>Thank you for your application</PopupBanner>
       <Typography.H2>{title}</Typography.H2>
       <Typography.H4>{message}</Typography.H4>
       <TickWrap>
