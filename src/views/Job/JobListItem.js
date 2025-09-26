@@ -12,6 +12,12 @@ import { route } from "../../routes";
 import FilledJobBanner from "../../components/FilledJobBanner";
 import SimpleFilledBanner from "../../components/SimpleFilledBanner";
 
+const SmallBannerWrapper = styled.div`
+  max-width: 180px;
+  width: 100%;
+  margin: 1rem 0;
+`;
+
 const Job = styled.li`
   border-bottom: 1px solid ${borderColorPrimary};
   padding: 3rem 0rem;
@@ -111,11 +117,23 @@ export default (
   key
 ) => {
   const salary = formatSalary(salary_from, salary_to, salary_per);
-  const isFilled = (job_startdate || job_start) === "Already Filled";
-  
+
+  // Check if job is older than 2 months
+  const isOlderThan2Months = (() => {
+    if (!createdAt) return false;
+    const jobDate = new Date(createdAt);
+    const now = new Date();
+    const diffMonths =
+      (now.getFullYear() - jobDate.getFullYear()) * 12 +
+      (now.getMonth() - jobDate.getMonth());
+    return diffMonths >= 2;
+  })();
+
+  const isFilled =
+    (job_startdate || job_start) === "Already Filled" || isOlderThan2Months;
+
   return (
     <Job key={key}>
-      {isFilled && <SimpleFilledBanner />}
       <Start>
         <Typography.H4>{job_title}</Typography.H4>
         <BodySmall>{truncate(job_description, 165)}</BodySmall>
@@ -127,12 +145,16 @@ export default (
         <Typography.Meta>{job_type}</Typography.Meta>
       </List>
       <End>
-        <List>
-          <Typography.Meta>Job starts:</Typography.Meta>
-          <Typography.Meta>
-            {job_startdate || job_start || "Already Filled"}
-          </Typography.Meta>
-        </List>
+        {isFilled ? (
+          <SmallBannerWrapper>
+            <SimpleFilledBanner />
+          </SmallBannerWrapper>
+        ) : (
+          <List>
+            <Typography.Meta>Job starts:</Typography.Meta>
+            <Typography.Meta>{job_startdate || job_start}</Typography.Meta>
+          </List>
+        )}
         <Typography.Link
           to={`${route.jobs}/${toPostUrl({
             title: job_title,

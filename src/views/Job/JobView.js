@@ -10,6 +10,14 @@ import { ApplyNow } from "./Links";
 import FilledJobBanner from "../../components/FilledJobBanner";
 import SimpleFilledBanner from "../../components/SimpleFilledBanner";
 
+const JobFilledHighlight = styled.span`
+  background: #feb464d2;
+  color: white;
+  padding: 0.2em 0.6em;
+  border-radius: 0.3em;
+  font-weight: bold;
+`;
+
 const cssOuterIntro = css`
   background: ${palette.grey};
 `;
@@ -93,6 +101,9 @@ const cssOuterDesc = css`
 `;
 
 const cssInnerDesc = css``;
+const JobDescriptionLeft = styled.div`
+  text-align: left;
+`;
 
 const MainContent = styled.div`
   position: relative;
@@ -181,12 +192,23 @@ export default withRouter(
     }, []);
 
     const salary = formatSalary(salary_from, salary_to, salary_per);
-    const isFilled = (job_startdate || job_start) === "Already Filled";
+    // Check if job is older than 2 months
+    const isOlderThan2Months = (() => {
+      if (!createdAt) return false;
+      const jobDate = new Date(createdAt);
+      const now = new Date();
+      const diffMonths =
+        (now.getFullYear() - jobDate.getFullYear()) * 12 +
+        (now.getMonth() - jobDate.getMonth());
+      return diffMonths >= 2;
+    })();
+
+    const isFilled =
+      (job_startdate || job_start) === "Already Filled" || isOlderThan2Months;
 
     return (
       <React.Fragment>
         <MainContent>
-          {isFilled && <SimpleFilledBanner />}
           <Center cssOuter={cssOuterIntro} cssInner={cssInnerIntro}>
             <Heading>
               <Typography.Link to={route.jobs}>
@@ -200,7 +222,13 @@ export default withRouter(
               <Entry title="Salary" value={salary} />
               <Entry
                 title="Starts"
-                value={job_startdate || job_start || "Already Filled"}
+                value={
+                  isFilled ? (
+                    <JobFilledHighlight>Job Filled</JobFilledHighlight>
+                  ) : (
+                    job_startdate || job_start
+                  )
+                }
               />
               <Entry title="Industry" value={job_industry} />
               <Entry title="Date posted" value={formatDateTime(createdAt)} />
@@ -210,7 +238,9 @@ export default withRouter(
           <Center cssOuter={cssOuterDesc} cssInner={cssInnerDesc}>
             <Skills>{job_skills}</Skills>
             <HeaderFullFlex type="none" title={"Job description"}>
-              <Markdown source={job_description} />
+              <JobDescriptionLeft>
+                <Markdown source={job_description} />
+              </JobDescriptionLeft>
             </HeaderFullFlex>
           </Center>
         </MainContent>
