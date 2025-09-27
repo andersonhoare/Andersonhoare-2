@@ -124,10 +124,10 @@ export default function ApplyForJob() {
     formData.append("upload_preset", process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET);
 
     const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/upload`, {
-      method: "POST",
-      body: formData,
-    });
+   const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/raw/upload`, {
+  method: "POST",
+  body: formData,
+});
 
     const data = await res.json();
     if (!data.secure_url) throw new Error("Cloudinary upload failed");
@@ -168,6 +168,7 @@ export default function ApplyForJob() {
           validationSchema={validationSchema}
           onSubmit={async (values, { resetForm }) => {
             try {
+              console.log("Message value:", values.message);
               const fileUrl = await uploadToCloudinary(values.file);
               await sendEmail(values, fileUrl);
               setSubmitted(true);
@@ -178,8 +179,10 @@ export default function ApplyForJob() {
             }
           }}
         >
-          {({ setFieldValue, values, isValid, dirty }) => (
-            <Form>
+          {({ setFieldValue, values, isValid, dirty }) => {
+            console.log('Formik values:', values);
+            return (
+              <Form>
               <FormRow>
                 <Label htmlFor="name">Full name</Label>
                 <FieldWrap>
@@ -269,7 +272,8 @@ export default function ApplyForJob() {
                 </FieldWrap>
               </FormRow>
             </Form>
-          )}
+            );
+          }}
         </Formik>
       )}
     </Container>

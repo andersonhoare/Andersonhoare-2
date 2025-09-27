@@ -37,10 +37,15 @@ const StyledInput = styled(Field)`
   ${sharedStyles}
 `;
 
-const StyledTextArea = styled(Field)`
+const StyledTextArea = styled(Field).attrs({ as: "textarea" })`
   ${sharedStyles}
   min-height: 16rem;
   resize: vertical;
+  padding: 1rem; 
+  box-sizing: border-box; 
+  vertical-align: top;
+  text-align: left; 
+  font-size: 1.6rem;
 `;
 
 const StyledCheckbox = styled(Field)`
@@ -96,11 +101,12 @@ const Submit = styled.button`
   }
 `;
 
-
 export const TextArea = ({ name, label, ...props }) => (
   <Wrap>
     {label && <Label htmlFor={name}>{label}</Label>}
-    <StyledTextArea as="textarea" id={name} name={name} {...props} />
+    <Field as="textarea" id={name} name={name}>
+      {({ field }) => <StyledTextArea {...field} {...props} />}
+    </Field>
     <ErrorMessage name={name} component={ErrorText} />
   </Wrap>
 );
