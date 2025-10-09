@@ -6,6 +6,7 @@ import Input, { Submit, Checbox, TextArea } from "../components/Input";
 import OnSuccess from "./OnSuccess";
 import emailjs from "@emailjs/browser";
 
+
 const Container = styled.div`
   padding: 5rem 2rem;
 `;
@@ -117,6 +118,18 @@ const validationSchema = Yup.object({
 
 export default function ApplyForJob() {
   const [submitted, setSubmitted] = useState(false);
+  const jobSlug = window.location.pathname.split("/").pop();  
+
+ let jobTitle = jobSlug.replace(/^\d{4}-\d{2}-\d{2}-/, "");
+ jobTitle = jobTitle.replace(/---/g, " ");
+ jobTitle = jobTitle.replace(/-/g, " ");
+ jobTitle = jobTitle.replace(/\s+/g, " ").trim();
+ jobTitle = jobTitle
+  .split(" ")
+  .map((word) => word[0]?.toUpperCase() + word.slice(1))
+  .join(" ");
+
+  jobTitle = jobTitle.replace(/\s\d+$/, "");
 
   const uploadToCloudinary = async (file) => {
     const formData = new FormData();
@@ -141,6 +154,7 @@ export default function ApplyForJob() {
       phone: values.phone || "N/A",
       message: values.message || "N/A",
       file_url: fileUrl,
+       job: jobTitle,
     };
 
     await emailjs.send(
