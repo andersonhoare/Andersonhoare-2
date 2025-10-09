@@ -14,5 +14,5 @@ const Banner = styled.div`
 `;
 
 export default function SimpleFilledBanner() {
-  return <Banner>This job is already filled</Banner>;
+  return <Banner>This job has been filled</Banner>;
 } 
