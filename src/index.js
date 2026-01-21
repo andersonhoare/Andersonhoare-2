@@ -18,7 +18,8 @@ import Footer from "./components/Footer";
 
 window.gtag = window.gtag || console.log;
 
-import { fetchContent, fetchServices } from "./reducer";
+// --- FIX: Added fetchJobs and fetchBlogs to this import ---
+import { fetchContent, fetchServices, fetchJobs, fetchBlogs } from "./reducer";
 
 const Main = styled.main`
   padding-top: 12rem;
@@ -33,6 +34,9 @@ const Root = () => {
   React.useEffect(async () => {
     await fetchContent(dispatch);
     await fetchServices(dispatch);
+    // --- FIX: Now fetching Jobs and Blogs so the links work ---
+    await fetchJobs(dispatch);
+    await fetchBlogs(dispatch);
   }, []);
 
   return (
