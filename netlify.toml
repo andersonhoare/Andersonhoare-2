@@ -18,6 +18,12 @@
   force = true
 
 [[redirects]]
+  from = "/apply/*"
+  to = "/jobs/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
   from = "/jobs/*"
   to = "/index.html"
   status = 200
