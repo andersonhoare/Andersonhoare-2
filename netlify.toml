@@ -16,13 +16,6 @@
   to = "https://andersonhoare.co.uk/blog/2018-12-19-how-towork-with-a-recruitment-agency-"
   status = 301
   force = true
-  
-[[redirects]]
-  from = "/*"
-  query = {redirect = ":true"}
-  to = "/"
-  status = 301
-  force = true
 
 [[redirects]]
   from = "/jobs/*"
