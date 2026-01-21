@@ -8,6 +8,10 @@ const SPACE_ID = process.env.CONTENTFUL_SPACE || '3yxhsx9gms6e';
 const ACCESS_TOKEN = process.env.CONTENTFUL_ACCESS_TOKEN || 'f75bd89be6664c959f01eb597d1761ea793a78f35f24f2f12d1f3287bec831b8';
 const SITE_URL = 'https://andersonhoare.co.uk';
 
+console.log('🔍 Contentful Config:');
+console.log('   Space ID:', SPACE_ID);
+console.log('   Access Token:', ACCESS_TOKEN ? `${ACCESS_TOKEN.substring(0, 10)}...` : 'MISSING');
+
 // --- ROBOTS.TXT CONTENT ---
 const robotsContent = `User-agent: *
 Disallow: /api/
@@ -82,7 +86,7 @@ const toPostUrl = ({ title, createdAt, job_reference }) => {
         .replace(/[^\w\-]/g, "")  // Remove everything except word chars and hyphens
         .replace(/\-+/g, "-");     // Replace multiple hyphens with single hyphen
     
-    return combined;  // Don't use encodeURIComponent here - it creates %0A mess
+    return combined;
 };
 
 // --- MAIN FUNCTION ---
@@ -107,32 +111,32 @@ async function generate() {
     try {
         console.log('📡 Fetching jobs and blogs from Contentful...');
         
-        // FIXED: Fetch only job listings with proper query
-        const jobsResponse = await client.getEntries({
-            content_type: 'jobListing',
-            limit: 1000,
-            order: '-sys.updatedAt'  // Most recent first
+        // Fetch all entries
+        const entries = await client.getEntries({ limit: 1000 });
+        
+        console.log('🔍 DEBUG: Total entries fetched:', entries.items.length);
+        console.log('🔍 DEBUG: Total entries found:', entries.total);
+        
+        // Log first few items to see what we got
+        if (entries.items.length > 0) {
+            console.log('🔍 DEBUG: First item fields:', Object.keys(entries.items[0].fields || {}));
+            console.log('🔍 DEBUG: First item sys:', Object.keys(entries.items[0].sys || {}));
+        }
+        
+        // Filter jobs: has job_title and created after 2023
+        const jobs = entries.items.filter(item => {
+            if (!item.fields || !item.fields.job_title) return false;
+            
+            // Only include jobs from 2023 onwards
+            const createdYear = new Date(item.sys.createdAt).getFullYear();
+            if (createdYear < 2023) return false;
+            
+            return true;
         });
         
-        // FIXED: Fetch only blog posts with proper query
-        const blogsResponse = await client.getEntries({
-            content_type: 'blogPost',
-            limit: 1000,
-            order: '-sys.updatedAt'
-        });
-        
-        // FIXED: Filter out entries without required fields and only published ones
-        const jobs = jobsResponse.items.filter(item => {
-            return item.fields && 
-                   item.fields.job_title && 
-                   item.sys.publishedAt &&  // Only published entries
-                   !item.fields.archived;    // Exclude archived jobs (if you have this field)
-        });
-        
-        const blogs = blogsResponse.items.filter(item => {
-            return item.fields && 
-                   item.fields.title && 
-                   item.sys.publishedAt;  // Only published entries
+        // Filter blogs: has title but not job_title
+        const blogs = entries.items.filter(item => {
+            return item.fields && item.fields.title && !item.fields.job_title;
         });
         
         console.log(`📝 Found ${jobs.length} Jobs and ${blogs.length} Blogs.`);
@@ -154,7 +158,6 @@ ${jobs.map(job => {
         job_reference: job.fields.job_reference
     });
     
-    // Skip if slug generation failed
     if (!slug) return '';
     
     return `    <url><loc>${SITE_URL}/jobs/${slug}</loc><lastmod>${job.sys.updatedAt.slice(0, 10)}</lastmod><changefreq>weekly</changefreq></url>`;
@@ -165,7 +168,6 @@ ${blogs.map(blog => {
         createdAt: blog.sys.createdAt
     });
     
-    // Skip if slug generation failed
     if (!slug) return '';
     
     return `    <url><loc>${SITE_URL}/blog/${slug}</loc><lastmod>${blog.sys.updatedAt.slice(0, 10)}</lastmod><changefreq>monthly</changefreq></url>`;
@@ -177,6 +179,8 @@ ${blogs.map(blog => {
         
     } catch (error) {
         console.error('❌ Error generating sitemap:', error);
+        console.error('❌ Error details:', error.message);
+        console.error('❌ Error stack:', error.stack);
     }
 }
 
