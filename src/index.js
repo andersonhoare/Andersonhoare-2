@@ -1,6 +1,4 @@
 import 'dotenv/config';
-// import '@babel/polyfill';
-
 import "promise-polyfill/src/polyfill";
 import "url-search-params-polyfill";
 
@@ -10,7 +8,7 @@ import { BrowserRouter } from "react-router-dom";
 import { media, GlobalStyle } from "./style";
 import styled from "styled-components";
 import Routes from "./routes";
-import { reducer, initialState, fetchContent, fetchServices, fetchJobs, fetchBlogs } from "./reducer"; // Ensure all are imported
+import { reducer, initialState, fetchContent, fetchServices, fetchJobs, fetchBlogs } from "./reducer"; 
 import Nav from "./components/Nav";
 import Banner from "./components/Banner";
 import Footer from "./components/Footer";
@@ -28,19 +26,14 @@ const Root = () => {
   const [state, dispatch] = React.useReducer(reducer, initialState);
 
   React.useEffect(() => {
-    // --- FIX: The async function must be INSIDE the effect ---
-    const loadData = async () => {
-      try {
-        await fetchContent(dispatch);
-        await fetchServices(dispatch);
-        await fetchJobs(dispatch);
-        await fetchBlogs(dispatch);
-      } catch (error) {
-        console.error("Error loading data:", error);
-      }
+    // --- NON-BLOCKING LOAD: Prevents 502/504 Timeouts ---
+    const loadData = () => {
+       fetchContent(dispatch);
+       fetchServices(dispatch);
+       fetchJobs(dispatch);
+       fetchBlogs(dispatch);
     };
 
-    // --- Execute it immediately ---
     loadData();
   }, []);
 
