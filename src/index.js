@@ -10,16 +10,12 @@ import { BrowserRouter } from "react-router-dom";
 import { media, GlobalStyle } from "./style";
 import styled from "styled-components";
 import Routes from "./routes";
-import { reducer, initialState } from "./reducer";
+import { reducer, initialState, fetchContent, fetchServices, fetchJobs, fetchBlogs } from "./reducer"; // Ensure all are imported
 import Nav from "./components/Nav";
 import Banner from "./components/Banner";
-
 import Footer from "./components/Footer";
 
 window.gtag = window.gtag || console.log;
-
-// --- FIX: Added fetchJobs and fetchBlogs to this import ---
-import { fetchContent, fetchServices, fetchJobs, fetchBlogs } from "./reducer";
 
 const Main = styled.main`
   padding-top: 12rem;
@@ -31,12 +27,21 @@ const Main = styled.main`
 const Root = () => {
   const [state, dispatch] = React.useReducer(reducer, initialState);
 
-  React.useEffect(async () => {
-    await fetchContent(dispatch);
-    await fetchServices(dispatch);
-    // --- FIX: Now fetching Jobs and Blogs so the links work ---
-    await fetchJobs(dispatch);
-    await fetchBlogs(dispatch);
+  React.useEffect(() => {
+    // --- FIX: The async function must be INSIDE the effect ---
+    const loadData = async () => {
+      try {
+        await fetchContent(dispatch);
+        await fetchServices(dispatch);
+        await fetchJobs(dispatch);
+        await fetchBlogs(dispatch);
+      } catch (error) {
+        console.error("Error loading data:", error);
+      }
+    };
+
+    // --- Execute it immediately ---
+    loadData();
   }, []);
 
   return (
@@ -48,11 +53,6 @@ const Root = () => {
           <Nav />
           <Main>
             <Routes
-              // content={state.content}
-              // instagrams={state.instagrams}
-              // blogs={state.blogs}
-              // roles={state.roles}
-              // jobs={state.broadbean.concat(state.jobs)}
               {...state}
               dispatch={dispatch}
             />
