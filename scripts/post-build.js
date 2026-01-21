@@ -127,7 +127,7 @@ async function generate() {
         const jobs = entries.items.filter(item => {
             if (!item.fields || !item.fields.job_title) return false;
             
-            // Only include jobs from 2023 onwards
+            // Only include jobs from 2023 onwards (filters out 2020 jobs)
             const createdYear = new Date(item.sys.createdAt).getFullYear();
             if (createdYear < 2023) return false;
             
@@ -163,10 +163,19 @@ ${jobs.map(job => {
     return `    <url><loc>${SITE_URL}/jobs/${slug}</loc><lastmod>${job.sys.updatedAt.slice(0, 10)}</lastmod><changefreq>weekly</changefreq></url>`;
 }).filter(Boolean).join('\n')}
 ${blogs.map(blog => {
-    const slug = toPostUrl({
+    let slug = toPostUrl({
         title: blog.fields.title,
         createdAt: blog.sys.createdAt
     });
+    
+    // Truncate URLs longer than 150 characters (some blog titles have entire paragraphs)
+    if (slug.length > 150) {
+        slug = slug.substring(0, 150);
+        // Remove trailing hyphen if truncation created one
+        while(slug.endsWith('-')) { 
+            slug = slug.slice(0, -1); 
+        }
+    }
     
     if (!slug) return '';
     
