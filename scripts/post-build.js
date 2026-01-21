@@ -1,8 +1,15 @@
 const fs = require('fs');
 const path = require('path');
+const contentful = require('contentful');
+require('dotenv').config();
 
-// 1. DEFINING THE ROBOTS.TXT CONTENT
-// This applies the brakes so your server stops crashing (502s)
+// --- CONFIGURATION ---
+// We try to read from your .env file first, but fallback to the keys you provided just in case.
+const SPACE_ID = process.env.CONTENTFUL_SPACE || '3yxhsx9gms6e';
+const ACCESS_TOKEN = process.env.CONTENTFUL_ACCESS_TOKEN || 'f75bd89be6664c959f01eb597d1761ea793a78f35f24f2f12d1f3287bec831b8';
+const SITE_URL = 'https://andersonhoare.co.uk';
+
+// --- ROBOTS.TXT CONTENT (The 502 Fix) ---
 const robotsContent = `User-agent: *
 Disallow: /api/
 Disallow: /_next/
@@ -48,16 +55,91 @@ Crawl-delay: 5
 Sitemap: https://andersonhoare.co.uk/sitemap.xml
 `;
 
-// 2. FINDING THE PUBLIC FOLDER
-// The build process sometimes deletes this folder, so we make sure it exists
-const publicDir = path.join(__dirname, '../public');
+// --- HELPER: URL GENERATOR (Ported from utils.js) ---
+const toPostUrl = ({ title, createdAt, job_reference }) => {
+    // Logic copied from your utils.js to match your site's links exactly
+    let main = createdAt
+        ? `${createdAt.slice(0, 10)}-${title}`.split(" ").join("-")
+        : `${title}`.split(" ").join("-");
+    
+    let ref = job_reference ? `-${job_reference}` : "";
+    
+    // Trim trailing dashes (replacement for Ramda dropLastWhile)
+    let main_trim = main;
+    while(main_trim.endsWith('-')) { main_trim = main_trim.slice(0, -1); }
+    
+    const combined = (main_trim + ref).toLowerCase().replace(/[^\w\-\s]/g, "");
+    return encodeURIComponent(combined);
+};
 
-if (!fs.existsSync(publicDir)){
-    fs.mkdirSync(publicDir);
+// --- MAIN FUNCTION ---
+async function generate() {
+    console.log('🏗️  Starting Post-Build Script...');
+
+    // 1. Setup Public Directory
+    const publicDir = path.join(__dirname, '../public');
+    if (!fs.existsSync(publicDir)) {
+        fs.mkdirSync(publicDir);
+    }
+
+    // 2. Restore Robots.txt (Priority #1)
+    fs.writeFileSync(path.join(publicDir, 'robots.txt'), robotsContent);
+    console.log('✅ Robots.txt restored.');
+
+    // 3. Fetch Data from Contentful
+    const client = contentful.createClient({
+        space: SPACE_ID,
+        accessToken: ACCESS_TOKEN
+    });
+
+    try {
+        console.log('📡 Fetching jobs and blogs from Contentful...');
+        // Fetch up to 1000 items (should cover everything)
+        const entries = await client.getEntries({ limit: 1000 });
+        
+        const jobs = entries.items.filter(item => item.fields.job_title);
+        const blogs = entries.items.filter(item => item.fields.title && !item.fields.job_title);
+        
+        console.log(`📝 Found ${jobs.length} Jobs and ${blogs.length} Blogs.`);
+
+        // 4. Build XML Content
+        let xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url><loc>${SITE_URL}/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
+    <url><loc>${SITE_URL}/about</loc><priority>0.8</priority></url>
+    <url><loc>${SITE_URL}/jobs</loc><priority>0.9</priority></url>
+    <url><loc>${SITE_URL}/blog</loc><priority>0.8</priority></url>
+    <url><loc>${SITE_URL}/contact</loc><priority>0.7</priority></url>
+    <url><loc>${SITE_URL}/clients</loc><priority>0.7</priority></url>
+    <url><loc>${SITE_URL}/candidates</loc><priority>0.7</priority></url>
+    <url><loc>${SITE_URL}/privacy</loc><priority>0.5</priority></url>
+
+    ${jobs.map(job => {
+    const slug = toPostUrl({
+        title: job.fields.job_title,
+        createdAt: job.sys.createdAt,
+        job_reference: job.fields.job_reference
+    });
+    return `    <url><loc>${SITE_URL}/job/${slug}</loc><lastmod>${job.sys.updatedAt.slice(0, 10)}</lastmod><changefreq>weekly</changefreq></url>`;
+}).join('\n')}
+
+    ${blogs.map(blog => {
+    const slug = toPostUrl({
+        title: blog.fields.title,
+        createdAt: blog.sys.createdAt
+    });
+    return `    <url><loc>${SITE_URL}/blog/${slug}</loc><lastmod>${blog.sys.updatedAt.slice(0, 10)}</lastmod><changefreq>monthly</changefreq></url>`;
+}).join('\n')}
+</urlset>`;
+
+        // 5. Write Sitemap
+        fs.writeFileSync(path.join(publicDir, 'sitemap.xml'), xml);
+        console.log('✅ Sitemap.xml generated with dynamic content!');
+
+    } catch (error) {
+        console.error('❌ Error generating sitemap:', error);
+        // Even if sitemap fails, robots.txt is already saved, so the site won't crash.
+    }
 }
 
-// 3. WRITING THE FILE
-// This forces the file to exist right before the site goes live
-fs.writeFileSync(path.join(publicDir, 'robots.txt'), robotsContent);
-
-console.log('✅ Success: robots.txt has been restored in the public folder!');
+generate();
