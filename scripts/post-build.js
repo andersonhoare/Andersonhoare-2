@@ -8,7 +8,7 @@ const SPACE_ID = process.env.CONTENTFUL_SPACE || '3yxhsx9gms6e';
 const ACCESS_TOKEN = process.env.CONTENTFUL_ACCESS_TOKEN || 'f75bd89be6664c959f01eb597d1761ea793a78f35f24f2f12d1f3287bec831b8';
 const SITE_URL = 'https://andersonhoare.co.uk';
 
-// --- ROBOTS.TXT CONTENT (The Fix: Allowing JS to load) ---
+// --- ROBOTS.TXT CONTENT ---
 const robotsContent = `User-agent: *
 Disallow: /api/
 Crawl-delay: 5
@@ -52,24 +52,43 @@ Crawl-delay: 5
 Sitemap: https://andersonhoare.co.uk/sitemap.xml
 `;
 
-// --- HELPER: URL GENERATOR ---
+// --- HELPER: URL GENERATOR (FIXED) ---
 const toPostUrl = ({ title, createdAt, job_reference }) => {
+    if (!title) return '';
+    
+    // Remove line breaks, extra spaces, and special characters FIRST
+    let cleanTitle = title
+        .replace(/[\n\r]+/g, ' ')  // Replace line breaks with spaces
+        .replace(/\s+/g, ' ')       // Replace multiple spaces with single space
+        .trim();                     // Remove leading/trailing spaces
+    
     let main = createdAt
-        ? `${createdAt.slice(0, 10)}-${title}`.split(" ").join("-")
-        : `${title}`.split(" ").join("-");
+        ? `${createdAt.slice(0, 10)}-${cleanTitle}`
+        : cleanTitle;
+    
+    // Replace spaces with hyphens
+    main = main.split(" ").join("-");
     
     let ref = job_reference ? `-${job_reference}` : "";
-    let main_trim = main;
-    while(main_trim.endsWith('-')) { main_trim = main_trim.slice(0, -1); }
     
-    const combined = (main_trim + ref).toLowerCase().replace(/[^\w\-\s]/g, "");
-    return encodeURIComponent(combined);
+    // Remove trailing hyphens
+    while(main.endsWith('-')) { 
+        main = main.slice(0, -1); 
+    }
+    
+    // Combine and clean
+    const combined = (main + ref)
+        .toLowerCase()
+        .replace(/[^\w\-]/g, "")  // Remove everything except word chars and hyphens
+        .replace(/\-+/g, "-");     // Replace multiple hyphens with single hyphen
+    
+    return combined;  // Don't use encodeURIComponent here - it creates %0A mess
 };
 
 // --- MAIN FUNCTION ---
 async function generate() {
     console.log('🏗️  Starting Post-Build Script...');
-
+    
     const publicDir = path.join(__dirname, '../public');
     if (!fs.existsSync(publicDir)) {
         fs.mkdirSync(publicDir);
@@ -87,13 +106,37 @@ async function generate() {
 
     try {
         console.log('📡 Fetching jobs and blogs from Contentful...');
-        const entries = await client.getEntries({ limit: 1000 });
         
-        const jobs = entries.items.filter(item => item.fields.job_title);
-        const blogs = entries.items.filter(item => item.fields.title && !item.fields.job_title);
+        // FIXED: Fetch only job listings with proper query
+        const jobsResponse = await client.getEntries({
+            content_type: 'jobListing',
+            limit: 1000,
+            order: '-sys.updatedAt'  // Most recent first
+        });
+        
+        // FIXED: Fetch only blog posts with proper query
+        const blogsResponse = await client.getEntries({
+            content_type: 'blogPost',
+            limit: 1000,
+            order: '-sys.updatedAt'
+        });
+        
+        // FIXED: Filter out entries without required fields and only published ones
+        const jobs = jobsResponse.items.filter(item => {
+            return item.fields && 
+                   item.fields.job_title && 
+                   item.sys.publishedAt &&  // Only published entries
+                   !item.fields.archived;    // Exclude archived jobs (if you have this field)
+        });
+        
+        const blogs = blogsResponse.items.filter(item => {
+            return item.fields && 
+                   item.fields.title && 
+                   item.sys.publishedAt;  // Only published entries
+        });
         
         console.log(`📝 Found ${jobs.length} Jobs and ${blogs.length} Blogs.`);
-
+        
         let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url><loc>${SITE_URL}/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
@@ -104,28 +147,34 @@ async function generate() {
     <url><loc>${SITE_URL}/clients</loc><priority>0.7</priority></url>
     <url><loc>${SITE_URL}/candidates</loc><priority>0.7</priority></url>
     <url><loc>${SITE_URL}/privacy</loc><priority>0.5</priority></url>
-
 ${jobs.map(job => {
     const slug = toPostUrl({
         title: job.fields.job_title,
         createdAt: job.sys.createdAt,
         job_reference: job.fields.job_reference
     });
+    
+    // Skip if slug generation failed
+    if (!slug) return '';
+    
     return `    <url><loc>${SITE_URL}/jobs/${slug}</loc><lastmod>${job.sys.updatedAt.slice(0, 10)}</lastmod><changefreq>weekly</changefreq></url>`;
-}).join('\n')}
-
+}).filter(Boolean).join('\n')}
 ${blogs.map(blog => {
     const slug = toPostUrl({
         title: blog.fields.title,
         createdAt: blog.sys.createdAt
     });
+    
+    // Skip if slug generation failed
+    if (!slug) return '';
+    
     return `    <url><loc>${SITE_URL}/blog/${slug}</loc><lastmod>${blog.sys.updatedAt.slice(0, 10)}</lastmod><changefreq>monthly</changefreq></url>`;
-}).join('\n')}
+}).filter(Boolean).join('\n')}
 </urlset>`;
 
         fs.writeFileSync(path.join(publicDir, 'sitemap.xml'), xml);
         console.log('✅ Sitemap.xml generated!');
-
+        
     } catch (error) {
         console.error('❌ Error generating sitemap:', error);
     }
