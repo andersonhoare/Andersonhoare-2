@@ -111,7 +111,7 @@ ${jobs.map(job => {
         createdAt: job.sys.createdAt,
         job_reference: job.fields.job_reference
     });
-    return `    <url><loc>${SITE_URL}/job/${slug}</loc><lastmod>${job.sys.updatedAt.slice(0, 10)}</lastmod><changefreq>weekly</changefreq></url>`;
+    return `    <url><loc>${SITE_URL}/jobs/${slug}</loc><lastmod>${job.sys.updatedAt.slice(0, 10)}</lastmod><changefreq>weekly</changefreq></url>`;
 }).join('\n')}
 
 ${blogs.map(blog => {
