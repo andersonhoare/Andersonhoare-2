@@ -1,0 +1,43 @@
+User-agent: *
+Disallow: /api/
+Disallow: /_next/
+Disallow: /static/
+Crawl-delay: 5
+
+User-agent: GPTBot
+Allow: /
+Crawl-delay: 5
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 5
+
+User-agent: ClaudeBot
+Allow: /
+Crawl-delay: 5
+
+User-agent: PerplexityBot
+Allow: /
+Crawl-delay: 5
+
+User-agent: Applebot
+Allow: /
+Crawl-delay: 5
+
+User-agent: CCBot
+Allow: /
+Crawl-delay: 5
+
+Sitemap: https://andersonhoare.co.uk/sitemap.xml
