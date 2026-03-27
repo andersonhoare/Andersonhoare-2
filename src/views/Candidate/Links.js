@@ -6,7 +6,7 @@ import { route } from '../../routes';
 export default () => {
   return (
     <FooterLink>
-      <Typography.LinkLarge to={route.register}>
+        <Typography.LinkLarge as="a" href="mailto:enquiries@andersonhoare.co.uk">
         Register your CV
       </Typography.LinkLarge>
       <Typography.LinkLarge to={route.jobs}>
