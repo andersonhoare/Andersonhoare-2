@@ -32,7 +32,7 @@ const cssInner = css`
 
 const ReportLink = styled.a`
   font-weight: 700;
-  color: #b94734;
+  color: #b84936;
   text-decoration: none;
   &:hover {
     text-decoration: underline;
