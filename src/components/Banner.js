@@ -30,6 +30,15 @@ const cssInner = css`
   `}; */
 `;
 
+const ReportLink = styled.a`
+  font-weight: 700;
+  color: #b94734;
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
 const Banner = styled.div`
   /* width: 100%; */
 
@@ -41,6 +50,7 @@ const StyledLink = styled(Link)`
   /* border-bottom: 1px solid currentColor; */
   font-weight: 600;
 `;
+
 
 class Header extends React.Component {
   constructor() {
@@ -74,10 +84,9 @@ class Header extends React.Component {
         maxWidth={sizes.desktop_xl}
         tagOuter="header"
       >
-        {/* <span>
-          Unlock your career potential with our free online course for
-          jobseekers – 5 Steps To Work
-        </span> */}
+     <span>
+  View our 2025 Annual Market Report <ReportLink href="/anderson-hoare-market-report-2025.pdf" target="_blank" rel="noopener noreferrer">here</ReportLink>
+</span>
         {/* <StyledLink to={"/your-potential"}>{""}</StyledLink> */}
       </Center>
     );
