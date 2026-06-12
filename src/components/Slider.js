@@ -1,14 +1,14 @@
-import React from 'react';
-import styled, { css, keyframes } from 'styled-components';
-import { Center, palette, media, Typography } from '../style';
-import { useGallery } from '../hooks';
-import pose from 'react-pose';
-import { toPostUrl, formatSalary, truncate } from '../utils';
-import { route } from '../routes';
-import ArrowLeft from './icons/ArrowLeft';
-import ArrowRight from './icons/ArrowRight';
-import QuoteMarkIcon from './icons/QuoteMark';
-import FilledJobBanner from './FilledJobBanner';
+import React from "react";
+import styled, { css, keyframes } from "styled-components";
+import { Center, palette, media, Typography } from "../style";
+import { useGallery } from "../hooks";
+import pose from "react-pose";
+import { toPostUrl, formatSalary, truncate } from "../utils";
+import { route } from "../routes";
+import ArrowLeft from "./icons/ArrowLeft";
+import ArrowRight from "./icons/ArrowRight";
+import QuoteMarkIcon from "./icons/QuoteMark";
+import FilledJobBanner from "./FilledJobBanner";
 
 const cssOuter = css`
   background: ${palette.grey};
@@ -21,11 +21,11 @@ const fade = keyframes`
 
 const PoseAnim_ = pose.li({
   in: {
-    opacity: 1
+    opacity: 1,
   },
   out: {
-    opacity: 0
-  }
+    opacity: 0,
+  },
 });
 
 const PoseAnim = styled(PoseAnim_)`
@@ -49,10 +49,10 @@ const TestimonyComponent = styled.div`
 }
 `;
 
-const Slider = styled.div.attrs({ className: 'slider' })`
+const Slider = styled.div.attrs({ className: "slider" })`
   display: grid;
   grid-template:
-    'arrowLeft content arrowRight' auto
+    "arrowLeft content arrowRight" auto
     / 0.5fr 2fr 1.3fr;
   align-items: center;
   padding: 4rem 0;
@@ -79,7 +79,7 @@ const Circle = styled.div`
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  ${({ css }) => css};
+  ${({ customCss }) => customCss};
 `;
 
 const arrowLeftCss = css`
@@ -186,9 +186,7 @@ const Testimony = ({ body, name, description, pose, testimonials }) => {
   const info = `${name} — ${description}`;
   return (
     <TestimonyComponent pose={pose}>
-      <QuoteMark>
-        {/* <QuoteMarkIcon fill={palette.primary} /> */}
-      </QuoteMark>
+      <QuoteMark>{/* <QuoteMarkIcon fill={palette.primary} /> */}</QuoteMark>
       <Typography.Testimonial>{body}</Typography.Testimonial>
       <Typography.Meta>{info}</Typography.Meta>
     </TestimonyComponent>
@@ -211,11 +209,11 @@ const Job = ({
   salary_benefits,
   job_skills,
   job_location,
-  job_description
+  job_description,
 }) => {
   const salary = formatSalary(salary_from, salary_to, salary_per);
   const isFilled = job_start === "Already Filled";
-  
+
   return (
     <JobComponent pose={pose}>
       {isFilled && <FilledJobBanner />}
@@ -226,7 +224,7 @@ const Job = ({
         to={`${route.jobs}/${toPostUrl({
           createdAt,
           title: job_title,
-          job_reference
+          job_reference,
         })}`}
       >
         Job details
@@ -238,10 +236,10 @@ const Job = ({
 const Item = ({ item, pose }) => {
   let i = null;
   if (!item) return null;
-  if (item.type == 'job') {
+  if (item.type == "job") {
     i = <Job {...item} />;
   }
-  if (item.type == 'testimonial') {
+  if (item.type == "testimonial") {
     i = <Testimony {...item} />;
   }
   return <PoseAnim pose={pose}>{i}</PoseAnim>;
@@ -249,8 +247,8 @@ const Item = ({ item, pose }) => {
 
 export default ({ orangeArrows, loop, items: itemsNoType, noDots }) => {
   if (!itemsNoType.length) return null;
-  const items = itemsNoType.map(x =>
-    Object.assign(x, { type: x.job_reference ? 'job' : 'testimonial' })
+  const items = itemsNoType.map((x) =>
+    Object.assign(x, { type: x.job_reference ? "job" : "testimonial" }),
   );
 
   const [isHover, setIsHover] = React.useState(false);
@@ -258,7 +256,7 @@ export default ({ orangeArrows, loop, items: itemsNoType, noDots }) => {
   const { index, pose, onPrev, onNext, onIndex } = useGallery({
     length: items.length,
     loop: loop,
-    isHover
+    isHover,
   });
 
   const item = items[index];
@@ -268,7 +266,11 @@ export default ({ orangeArrows, loop, items: itemsNoType, noDots }) => {
       onMouseEnter={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}
     >
-      <Circle orangeArrows={orangeArrows} css={arrowLeftCss} onClick={onPrev}>
+      <Circle
+        orangeArrows={orangeArrows}
+        customCss={arrowLeftCss}
+        onClick={onPrev}
+      >
         <ArrowLeft
           stroke={orangeArrows ? palette.secondaryAccent : palette.accent}
         />
@@ -285,7 +287,11 @@ export default ({ orangeArrows, loop, items: itemsNoType, noDots }) => {
           </DotWrap>
         )}
       </Content>
-      <Circle orangeArrows={orangeArrows} css={arrowRightCss} onClick={onNext}>
+      <Circle
+        orangeArrows={orangeArrows}
+        customCss={arrowRightCss}
+        onClick={onNext}
+      >
         <ArrowRight
           stroke={orangeArrows ? palette.secondaryAccent : palette.accent}
         />
