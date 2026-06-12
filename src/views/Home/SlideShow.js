@@ -1,14 +1,13 @@
-import React from 'react';
-import styled, { css, keyframes } from 'styled-components';
-import { Center, MetaLink, palette, sizes, media } from '../../style';
-import { fetchImageContentful } from '../../utils';
-import Slider from '../../components/Slider';
-
-import { Link } from 'react-router-dom';
+import React from "react";
+import styled, { css, keyframes } from "styled-components";
+import { Center, MetaLink, palette, sizes, media } from "../../style";
+import { fetchImageContentful } from "../../utils";
+import Slider from "../../components/Slider";
+import { Link } from "react-router-dom";
 
 const cssOuter = css`
   background: ${palette.secondary};
-  height: 40rem;
+  height: 50rem;
   width: 100%;
   min-width: 100%;
   ${media.mobile`
@@ -17,8 +16,8 @@ const cssOuter = css`
 `;
 
 const cssInner = css`
-   display: grid; 
-  grid-template-columns: repeat(2, 1fr); 
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   /* grid-gap: 2rem; */
   height: 100%;
   display: flex;
@@ -50,7 +49,7 @@ export default ({ items, heroImage }) => {
   // Filter out incomplete testimonials if present
   const filteredItems = Array.isArray(items)
     ? items.filter(
-        x => !x || (x.job_reference) || (x.name && x.description && x.body)
+        (x) => !x || x.job_reference || (x.name && x.description && x.body),
       )
     : items;
   return (
@@ -63,7 +62,8 @@ export default ({ items, heroImage }) => {
       <div>
         <Slider loop={8000} orangeArrows items={filteredItems} noDots />
       </div>
-      <Image src={fetchImageContentful(heroImage.file.url)} />
+      {/* <Image src={fetchImageContentful(heroImage.file.url)} /> */}
+      <Image src={require('../../assets/hero-watercolour-painting.png')} />
     </Center>
   );
 };
